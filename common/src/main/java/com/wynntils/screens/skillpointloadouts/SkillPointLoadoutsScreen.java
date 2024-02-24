@@ -236,6 +236,8 @@ public final class SkillPointLoadoutsScreen extends WynntilsGridLayoutScreen {
                             TextShadow.NORMAL);
         }
 
+        // i iterates over the summary parts populating top to bottom
+        // j iterates over the skills populating left to right
         for (int i = 0; i < summaryParts.size(); i++) {
             FontRenderer.getInstance()
                     .renderText(
