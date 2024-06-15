@@ -20,6 +20,7 @@ import com.wynntils.utils.render.type.HorizontalAlignment;
 import com.wynntils.utils.render.type.TextShadow;
 import com.wynntils.utils.render.type.VerticalAlignment;
 import com.wynntils.utils.type.ErrorOr;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -68,14 +69,15 @@ public abstract class TextOverlay extends DynamicOverlay {
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         if (!isRendered()) return;
 
         renderTemplate(poseStack, bufferSource, cachedLines, getTextScale());
     }
 
     @Override
-    public void renderPreview(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void renderPreview(
+            PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         if (!Models.WorldState.onWorld()) return;
 
         renderTemplate(poseStack, bufferSource, calculateTemplateValue(getPreviewTemplate()), getTextScale());

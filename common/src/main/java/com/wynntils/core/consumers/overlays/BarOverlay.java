@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.core.consumers.overlays;
@@ -21,6 +21,7 @@ import com.wynntils.utils.render.type.TextShadow;
 import com.wynntils.utils.type.CappedValue;
 import com.wynntils.utils.type.ErrorOr;
 import com.wynntils.utils.type.Pair;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -52,7 +53,7 @@ public abstract class BarOverlay extends DynamicOverlay {
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void render(PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         if (!isRendered()) return;
 
         BarOverlayTemplatePair template = getTemplate();
@@ -71,7 +72,8 @@ public abstract class BarOverlay extends DynamicOverlay {
     }
 
     @Override
-    public void renderPreview(PoseStack poseStack, MultiBufferSource bufferSource, float partialTicks, Window window) {
+    public void renderPreview(
+            PoseStack poseStack, MultiBufferSource bufferSource, DeltaTracker deltaTracker, Window window) {
         BarOverlayTemplatePair previewTemplate = getPreviewTemplate();
         Pair<StyledText, ErrorOr<CappedValue>> calculatedTemplate = calculateTemplate(previewTemplate);
 
