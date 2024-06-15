@@ -20,21 +20,14 @@ import com.wynntils.models.worlds.type.WorldState;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.type.Pair;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.scores.DisplaySlot;
-import net.minecraft.world.scores.Objective;
-import net.minecraft.world.scores.Score;
-import net.minecraft.world.scores.Scoreboard;
-import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.apache.commons.lang3.StringUtils;
 
 public final class ScoreboardHandler extends Handler {
     private static final Pattern NEXT_LINE_PATTERN = Pattern.compile("À+");
@@ -119,16 +112,20 @@ public final class ScoreboardHandler extends Handler {
     }
 
     private List<ScoreboardLine> getCurrentScoreboardState(String currentScoreboardName) {
-        Scoreboard scoreboard = McUtils.mc().level.getScoreboard();
-        Objective objective = scoreboard.getObjective(currentScoreboardName);
-        List<Score> lines = new ArrayList<>(scoreboard.getPlayerScores(objective));
-
-        // Lines are by default in reverse order
-        Collections.reverse(lines);
-
-        return lines.stream()
-                .map(s -> new ScoreboardLine(StyledText.fromString(s.getOwner()), s.getScore()))
-                .toList();
+        // FIXME: Fix
+        //        Scoreboard scoreboard = McUtils.mc().level.getScoreboard();
+        //        Objective objective = scoreboard.getObjective(currentScoreboardName);
+        //        PlayerScores playerScores = scoreboard.playerScores.get(currentScoreboardName);
+        //        List<Score> lines = playerScores == null ? new ArrayList<>() : new
+        // ArrayList<>(playerScores.scores.values());
+        //
+        //        // Lines are by default in reverse order
+        //        Collections.reverse(lines);
+        //
+        //        return lines.stream()
+        //                .map(s -> new ScoreboardLine(StyledText.fromString(s.getOwner()), s.value()))
+        //                .toList();
+        return List.of();
     }
 
     private List<ScoreboardPart> getValidScoreboardParts(List<ScoreboardLine> reconstructedScoreboard) {
@@ -323,58 +320,58 @@ public final class ScoreboardHandler extends Handler {
     }
 
     private void createScoreboardFromSegments(List<ScoreboardLine> reconstructedScoreboard) {
-        Scoreboard scoreboard = McUtils.player().getScoreboard();
-
-        Objective oldObjective = scoreboard.getObjective(SCOREBOARD_KEY);
-        if (oldObjective != null) {
-            scoreboard.removeObjective(oldObjective);
-        }
-
-        Objective wynntilsObjective = scoreboard.addObjective(
-                SCOREBOARD_KEY,
-                ObjectiveCriteria.DUMMY,
-                SCOREBOARD_TITLE_COMPONENT,
-                ObjectiveCriteria.RenderType.INTEGER);
-
-        scoreboard.setDisplayObjective(DisplaySlot.SIDEBAR, wynntilsObjective);
-
-        if (scoreboardSegments.stream().map(Pair::value).noneMatch(ScoreboardSegment::isVisible)) return;
-
-        int currentScoreboardLine = MAX_SCOREBOARD_LINE;
-
-        // Insert the first line at the top
-        scoreboard.getOrCreatePlayerScore("À", wynntilsObjective).setScore(currentScoreboardLine);
-        currentScoreboardLine--;
-
-        int separatorCount = 2;
-
-        // Insert the visible segments
-        List<ScoreboardSegment> segments =
-                scoreboardSegments.stream().map(Pair::value).toList();
-        for (int i = 0; i < segments.size(); i++) {
-            ScoreboardSegment scoreboardSegment = segments.get(i);
-            if (!scoreboardSegment.isVisible()) continue;
-
-            scoreboard
-                    .getOrCreatePlayerScore(scoreboardSegment.getHeader().getString(), wynntilsObjective)
-                    .setScore(currentScoreboardLine);
-            currentScoreboardLine--;
-
-            for (StyledText line : scoreboardSegment.getContent()) {
-                scoreboard
-                        .getOrCreatePlayerScore(line.getString(), wynntilsObjective)
-                        .setScore(currentScoreboardLine);
-                currentScoreboardLine--;
-            }
-
-            if (i != segments.size() - 1) {
-                scoreboard
-                        .getOrCreatePlayerScore(StringUtils.repeat('À', separatorCount), wynntilsObjective)
-                        .setScore(currentScoreboardLine);
-                currentScoreboardLine--;
-                separatorCount++;
-            }
-        }
+        //        Scoreboard scoreboard = McUtils.player().getScoreboard();
+        //
+        //        Objective oldObjective = scoreboard.getObjective(SCOREBOARD_KEY);
+        //        if (oldObjective != null) {
+        //            scoreboard.removeObjective(oldObjective);
+        //        }
+        //
+        //        Objective wynntilsObjective = scoreboard.addObjective(
+        //                SCOREBOARD_KEY,
+        //                ObjectiveCriteria.DUMMY,
+        //                SCOREBOARD_TITLE_COMPONENT,
+        //                ObjectiveCriteria.RenderType.INTEGER);
+        //
+        //        scoreboard.setDisplayObjective(DisplaySlot.SIDEBAR, wynntilsObjective);
+        //
+        //        if (scoreboardSegments.stream().map(Pair::value).noneMatch(ScoreboardSegment::isVisible)) return;
+        //
+        //        int currentScoreboardLine = MAX_SCOREBOARD_LINE;
+        //
+        //        // Insert the first line at the top
+        //        scoreboard.getOrCreatePlayerScore("À", wynntilsObjective).setScore(currentScoreboardLine);
+        //        currentScoreboardLine--;
+        //
+        //        int separatorCount = 2;
+        //
+        //        // Insert the visible segments
+        //        List<ScoreboardSegment> segments =
+        //                scoreboardSegments.stream().map(Pair::value).toList();
+        //        for (int i = 0; i < segments.size(); i++) {
+        //            ScoreboardSegment scoreboardSegment = segments.get(i);
+        //            if (!scoreboardSegment.isVisible()) continue;
+        //
+        //            scoreboard
+        //                    .getOrCreatePlayerScore(scoreboardSegment.getHeader().getString(), wynntilsObjective)
+        //                    .setScore(currentScoreboardLine);
+        //            currentScoreboardLine--;
+        //
+        //            for (StyledText line : scoreboardSegment.getContent()) {
+        //                scoreboard
+        //                        .getOrCreatePlayerScore(line.getString(), wynntilsObjective)
+        //                        .setScore(currentScoreboardLine);
+        //                currentScoreboardLine--;
+        //            }
+        //
+        //            if (i != segments.size() - 1) {
+        //                scoreboard
+        //                        .getOrCreatePlayerScore(StringUtils.repeat('À', separatorCount), wynntilsObjective)
+        //                        .setScore(currentScoreboardLine);
+        //                currentScoreboardLine--;
+        //                separatorCount++;
+        //            }
+        //        }
     }
 
     private ScoreboardPart getScoreboardPartForHeader(ScoreboardLine scoreboardLine) {
