@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2022-2023.
+ * Copyright © Wynntils 2022-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.mixin;
@@ -27,19 +27,24 @@ public abstract class ItemStackMixin implements ItemStackExtension {
 
     @ModifyExpressionValue(
             method =
-                    "getTooltipLines(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getHideFlags()I"))
-    private int redirectGetHideFlags(int original) {
+                    "getTooltipLines(Lnet/minecraft/world/item/Item$TooltipContext;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;",
+            at =
+                    @At(
+                            value = "INVOKE",
+                            target =
+                                    "Lnet/minecraft/world/item/ItemStack;has(Lnet/minecraft/core/component/DataComponentType;)Z",
+                            ordinal = 0))
+    private boolean redirectGetHideFlags(boolean original) {
         ItemStack itemStack = (ItemStack) (Object) this;
-        ItemTooltipFlagsEvent.Mask event = new ItemTooltipFlagsEvent.Mask(itemStack, original);
+        ItemTooltipFlagsEvent.HideTooltip event = new ItemTooltipFlagsEvent.HideTooltip(itemStack, original);
         MixinHelper.post(event);
 
-        return event.getMask();
+        return event.getHideTooltip();
     }
 
     @ModifyVariable(
             method =
-                    "getTooltipLines(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;",
+                    "getTooltipLines(Lnet/minecraft/world/item/Item$TooltipContext;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;",
             at = @At("HEAD"),
             ordinal = 0,
             argsOnly = true)

@@ -1,5 +1,5 @@
 /*
- * Copyright © Wynntils 2023.
+ * Copyright © Wynntils 2023-2024.
  * This file is released under LGPLv3. See LICENSE for full license details.
  */
 package com.wynntils.mc.event;
@@ -36,20 +36,20 @@ public abstract class ItemTooltipFlagsEvent extends Event {
         }
     }
 
-    public static final class Mask extends ItemTooltipFlagsEvent {
-        private int mask;
+    public static final class HideTooltip extends ItemTooltipFlagsEvent {
+        private boolean hideTooltip;
 
-        public Mask(ItemStack itemStack, int mask) {
+        public HideTooltip(ItemStack itemStack, boolean hideTooltip) {
             super(itemStack);
-            this.mask = mask;
+            this.hideTooltip = hideTooltip;
         }
 
-        public int getMask() {
-            return mask;
+        public boolean getHideTooltip() {
+            return hideTooltip;
         }
 
-        public void setMask(int mask) {
-            this.mask = mask;
+        public void setHideTooltip(boolean hideTooltip) {
+            this.hideTooltip = hideTooltip;
         }
     }
 }
