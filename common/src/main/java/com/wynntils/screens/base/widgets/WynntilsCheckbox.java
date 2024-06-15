@@ -16,7 +16,6 @@ import com.wynntils.utils.render.type.TextShadow;
 import com.wynntils.utils.render.type.VerticalAlignment;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.network.chat.Component;
@@ -26,12 +25,17 @@ public class WynntilsCheckbox extends Checkbox {
     private final int maxTextWidth;
     private final CustomColor color;
 
-    private BiConsumer<WynntilsCheckbox, Integer> onClick;
     private List<Component> tooltip;
 
+    public WynntilsCheckbox(int x, int y, int maxWidth, Component message, boolean selected, int maxTextWidth) {
+        super(x, y, maxWidth, message, FontRenderer.getInstance().getFont(), selected, OnValueChange.NOP);
+        this.maxTextWidth = maxTextWidth;
+        this.color = CommonColors.WHITE;
+    }
+
     public WynntilsCheckbox(
-            int x, int y, int width, int height, Component message, boolean selected, int maxTextWidth) {
-        super(x, y, width, height, message, selected);
+            int x, int y, int maxWidth, Component message, boolean selected, int maxTextWidth, OnValueChange onClick) {
+        super(x, y, maxWidth, message, FontRenderer.getInstance().getFont(), selected, onClick);
         this.maxTextWidth = maxTextWidth;
         this.color = CommonColors.WHITE;
     }
@@ -39,62 +43,43 @@ public class WynntilsCheckbox extends Checkbox {
     public WynntilsCheckbox(
             int x,
             int y,
-            int width,
-            int height,
+            int maxWidth,
             Component message,
             boolean selected,
             int maxTextWidth,
-            Consumer<Integer> onClick) {
-        super(x, y, width, height, message, selected);
-        this.maxTextWidth = maxTextWidth;
-        this.color = CommonColors.WHITE;
-        this.onClick = (checkbox, button) -> onClick.accept(button);
-    }
-
-    public WynntilsCheckbox(
-            int x,
-            int y,
-            int width,
-            int height,
-            Component message,
-            boolean selected,
-            int maxTextWidth,
-            Consumer<Integer> onClick,
+            OnValueChange onClick,
             List<Component> tooltip) {
-        super(x, y, width, height, message, selected);
+        super(x, y, maxWidth, message, FontRenderer.getInstance().getFont(), selected, onClick);
         this.maxTextWidth = maxTextWidth;
         this.color = CommonColors.WHITE;
-        this.onClick = (checkbox, button) -> onClick.accept(button);
         this.tooltip = tooltip;
     }
 
     public WynntilsCheckbox(
             int x,
             int y,
-            int width,
-            int height,
+            int maxWidth,
             Component message,
             boolean selected,
             int maxTextWidth,
-            BiConsumer<WynntilsCheckbox, Integer> onClick,
+            BiConsumer<WynntilsCheckbox, Boolean> onClick,
             List<Component> tooltip) {
-        super(x, y, width, height, message, selected);
+        super(
+                x,
+                y,
+                maxWidth,
+                message,
+                FontRenderer.getInstance().getFont(),
+                selected,
+                (checkbox, bl) -> onClick.accept((WynntilsCheckbox) checkbox, bl));
         this.maxTextWidth = maxTextWidth;
         this.color = CommonColors.WHITE;
-        this.onClick = onClick;
         this.tooltip = tooltip;
     }
 
     public WynntilsCheckbox(
-            int x,
-            int y,
-            int width,
-            int height,
-            Component message,
-            boolean selected,
-            int maxTextWidth,
-            CustomColor color) {
-        super(x, y, width, height, message, selected);
+            int x, int y, int maxWidth, Component message, boolean selected, int maxTextWidth, CustomColor color) {
+        super(x, y, maxWidth, message, FontRenderer.getInstance().getFont(), selected, OnValueChange.NOP);
         this.maxTextWidth = maxTextWidth;
         this.color = color;
     }
@@ -113,38 +98,21 @@ public class WynntilsCheckbox extends Checkbox {
 
         guiGraphics.blitSprite(resourceLocation, this.getX(), this.getY(), this.width, this.height);
         guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-        if (this.showLabel) {
-            FontRenderer.getInstance()
-                    .renderScrollingText(
-                            guiGraphics.pose(),
-                            StyledText.fromComponent(this.getMessage()),
-                            this.getX() + this.width + 2,
-                            this.getY() + (this.height / 2f),
-                            maxTextWidth,
-                            color,
-                            HorizontalAlignment.LEFT,
-                            VerticalAlignment.MIDDLE,
-                            TextShadow.NORMAL,
-                            1f);
-        }
+        FontRenderer.getInstance()
+                .renderScrollingText(
+                        guiGraphics.pose(),
+                        StyledText.fromComponent(this.getMessage()),
+                        this.getX() + this.width + 2,
+                        this.getY() + (this.height / 2f),
+                        maxTextWidth,
+                        color,
+                        HorizontalAlignment.LEFT,
+                        VerticalAlignment.MIDDLE,
+                        TextShadow.NORMAL,
+                        1f);
 
         if (isHovered && tooltip != null) {
             McUtils.mc().screen.setTooltipForNextRenderPass(Lists.transform(tooltip, Component::getVisualOrderText));
         }
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!isMouseOver(mouseX, mouseY)) return false;
-
-        // Do the click before the onClick so that the checkbox is updated before the consumer is called.
-        boolean superClicked = super.mouseClicked(mouseX, mouseY, button);
-
-        // Only trigger the onClick if the super was actually clicked
-        if (onClick != null && superClicked) {
-            onClick.accept(this, button);
-        }
-
-        return superClicked;
     }
 }

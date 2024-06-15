@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
 
 public class StringFilterWidget extends GeneralFilterWidget {
     private final Button removeButton;
@@ -60,15 +60,14 @@ public class StringFilterWidget extends GeneralFilterWidget {
                 getX() + inputWidth + 2,
                 getY(),
                 20,
-                20,
                 Component.translatable("screens.wynntils.itemFilter.strict"),
                 strict,
                 50,
-                (b -> {
-                    if (b == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+                (Checkbox.OnValueChange) (checkbox, bl) -> {
+                    if (bl) {
                         parent.updateQuery();
                     }
-                }),
+                },
                 List.of(Component.translatable("screens.wynntils.itemFilter.strictTooltip")));
 
         this.removeButton = new Button.Builder(Component.literal("🗑"), (button -> parent.removeWidget(this)))

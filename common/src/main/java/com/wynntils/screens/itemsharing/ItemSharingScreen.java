@@ -37,6 +37,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -226,14 +227,12 @@ public final class ItemSharingScreen extends WynntilsScreen {
                     backgroundX + 15,
                     backgroundY + 25,
                     10,
-                    10,
                     Component.translatable("screens.wynntils.itemSharing.extended.name"),
                     Models.ItemEncoding.extendedIdentificationEncoding.get(),
                     Texture.ITEM_SHARING_BACKGROUND.width() - 30,
-                    (b) -> {
-                        if (b == 0) {
-                            Models.ItemEncoding.extendedIdentificationEncoding.store(
-                                    !Models.ItemEncoding.extendedIdentificationEncoding.get());
+                    (Checkbox.OnValueChange) (c, b) -> {
+                        if (b) {
+                            Models.ItemEncoding.extendedIdentificationEncoding.store(b);
                             refreshPreview();
                         }
                     },
@@ -247,13 +246,12 @@ public final class ItemSharingScreen extends WynntilsScreen {
                     backgroundX + 15,
                     backgroundY + 25,
                     10,
-                    10,
                     Component.translatable("screens.wynntils.itemSharing.itemName.name"),
                     Models.ItemEncoding.shareItemName.get(),
                     Texture.ITEM_SHARING_BACKGROUND.width() - 30,
-                    (b) -> {
-                        if (b == 0) {
-                            Models.ItemEncoding.shareItemName.store(!Models.ItemEncoding.shareItemName.get());
+                    (Checkbox.OnValueChange) (c, b) -> {
+                        if (b) {
+                            Models.ItemEncoding.shareItemName.store(b);
                             refreshPreview();
                         }
                     },

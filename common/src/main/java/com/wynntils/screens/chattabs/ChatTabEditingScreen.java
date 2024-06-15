@@ -89,7 +89,7 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
                 (int) (dividedWidth * 35),
                 (int) ((dividedHeight * FIRST_ROW_Y)),
                 (int) (dividedWidth * 10),
-                BUTTON_HEIGHT,
+                BUTTON_WIDTH,
                 (s) -> updateSaveButtonActive(),
                 this,
                 nameInput);
@@ -108,7 +108,7 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
                 (int) (dividedWidth * 47),
                 (int) (dividedHeight * FIRST_ROW_Y),
                 (int) (dividedWidth * 10),
-                BUTTON_HEIGHT,
+                BUTTON_WIDTH,
                 null,
                 this,
                 autoCommandInput);
@@ -123,7 +123,7 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
                 (int) (dividedWidth * 59),
                 (int) (dividedHeight * FIRST_ROW_Y),
                 (int) (dividedWidth * 2),
-                BUTTON_HEIGHT,
+                BUTTON_WIDTH,
                 (s) -> updateSaveButtonActive(),
                 this,
                 orderInput);
@@ -161,13 +161,7 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
             boolean ticked = oldCheckboxSelected || editedFirstSetupSelected;
 
             WynntilsCheckbox newBox = new WynntilsCheckbox(
-                    x,
-                    y,
-                    BUTTON_HEIGHT,
-                    BUTTON_HEIGHT,
-                    Component.literal(type.getName()),
-                    ticked,
-                    (int) (dividedWidth * 7) - 24);
+                    x, y, BUTTON_WIDTH, Component.literal(type.getName()), ticked, (int) (dividedWidth * 7) - 24);
 
             this.addRenderableWidget(newBox);
             recipientTypeBoxes.add(newBox);
@@ -182,7 +176,7 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
                 (int) (dividedWidth * 35),
                 (int) (dividedHeight * THIRD_ROW_Y),
                 (int) (dividedWidth * 26),
-                BUTTON_HEIGHT,
+                BUTTON_WIDTH,
                 (s) -> updateSaveButtonActive(),
                 this,
                 filterRegexInput);
@@ -192,19 +186,18 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
         }
 
         regexErrorMsg = new TextWidget(
-                this.width / 2 - 160 + 100, this.height / 2 + 75 + 7, 200, BUTTON_HEIGHT, Component.empty());
+                this.width / 2 - 160 + 100, this.height / 2 + 75 + 7, 200, BUTTON_WIDTH, Component.empty());
         this.addRenderableWidget(regexErrorMsg);
         // endregion
 
         // region Consuming
-        consumingCheckbox = new Checkbox(
-                (int) (dividedWidth * 35),
-                (int) (dividedHeight * FOURTH_ROW_Y),
-                BUTTON_HEIGHT,
-                BUTTON_HEIGHT,
-                Component.translatable("screens.wynntils.chatTabsGui.consuming"),
-                consumingCheckbox != null && consumingCheckbox.selected(),
-                true);
+        consumingCheckbox = Checkbox.builder(
+                        Component.translatable("screens.wynntils.chatTabsGui.consuming"),
+                        FontRenderer.getInstance().getFont())
+                .pos((int) (dividedWidth * 35), (int) (dividedHeight * FOURTH_ROW_Y))
+                .maxWidth(BUTTON_WIDTH)
+                .selected(consumingCheckbox != null && consumingCheckbox.selected())
+                .build();
         this.addRenderableWidget(consumingCheckbox);
         if (firstSetup && edited != null) {
             consumingCheckbox.selected = edited.isConsuming();
@@ -220,7 +213,7 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
                             reloadChatTabsWidgets();
                         })
                 .pos((int) (dividedWidth * 35), (int) (dividedHeight * FIFTH_ROW_Y))
-                .size((int) (dividedWidth * 8), BUTTON_HEIGHT)
+                .size((int) (dividedWidth * 8), BUTTON_WIDTH)
                 .build();
         this.addRenderableWidget(saveButton);
 
@@ -233,14 +226,14 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
                             this.onClose();
                         })
                 .pos((int) (dividedWidth * 44), (int) (dividedHeight * FIFTH_ROW_Y))
-                .size((int) (dividedWidth * 8), BUTTON_HEIGHT)
+                .size((int) (dividedWidth * 8), BUTTON_WIDTH)
                 .build();
         this.addRenderableWidget(saveAndCloseButton);
 
         this.addRenderableWidget(new Button.Builder(
                         Component.translatable("screens.wynntils.chatTabsGui.cancel"), (button) -> this.onClose())
                 .pos((int) (dividedWidth * 53), (int) (dividedHeight * FIFTH_ROW_Y))
-                .size((int) (dividedWidth * 8), BUTTON_HEIGHT)
+                .size((int) (dividedWidth * 8), BUTTON_WIDTH)
                 .build());
         // endregion
 
@@ -439,7 +432,7 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
         List<ChatTab> chatTabs = Services.ChatTab.getChatTabs();
 
         int initialVerticalOffset =
-                (int) (dividedHeight * 32) - (int) ((dividedHeight * (chatTabs.size() * 5 + 1) + BUTTON_HEIGHT) / 2);
+                (int) (dividedHeight * 32) - (int) ((dividedHeight * (chatTabs.size() * 5 + 1) + BUTTON_WIDTH) / 2);
 
         for (int i = 0; i < chatTabs.size(); i++) {
             chatTabsWidgets.add(new ChatTabsWidget(
@@ -461,7 +454,7 @@ public final class ChatTabEditingScreen extends WynntilsGridLayoutScreen {
                 .pos(
                         (int) (dividedWidth * 13),
                         initialVerticalOffset + (int) (dividedHeight * (chatTabs.size() * 5 + 1)))
-                .size((int) (dividedWidth * 6), BUTTON_HEIGHT)
+                .size((int) (dividedWidth * 6), BUTTON_WIDTH)
                 .build());
     }
 }

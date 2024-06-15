@@ -50,6 +50,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -135,11 +136,10 @@ public final class OverlaySelectionScreen extends WynntilsScreen {
                 (Texture.OVERLAY_SELECTION_GUI.width() / 2) - 70,
                 (int) (this.height - 70 - translationY),
                 20,
-                20,
                 Component.translatable("screens.wynntils.overlaySelection.showOverlays"),
                 showOverlays,
                 120,
-                (b) -> showOverlays = !showOverlays,
+                (Checkbox.OnValueChange) (c, b) -> showOverlays = b,
                 ComponentUtils.wrapTooltips(
                         List.of(Component.translatable("screens.wynntils.overlaySelection.showOverlaysTooltip")),
                         150)));
