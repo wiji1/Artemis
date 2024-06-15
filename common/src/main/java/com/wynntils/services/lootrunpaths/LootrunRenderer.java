@@ -295,10 +295,9 @@ public final class LootrunRenderer {
     private static void renderPoint(VertexConsumer consumer, Matrix4f lastMatrix, ColoredPosition coloredPosition) {
         Position position = coloredPosition.position();
         int pathColor = coloredPosition.color();
-        consumer.vertex(lastMatrix, (float) position.x(), (float) position.y(), (float) position.z())
-                .color(pathColor)
-                .normal(0, 0, 1)
-                .endVertex();
+        consumer.addVertex(lastMatrix, (float) position.x(), (float) position.y(), (float) position.z())
+                .setColor(pathColor)
+                .setNormal(0, 0, 1);
     }
 
     private static void renderTexturedQueuedPoints(
@@ -354,24 +353,20 @@ public final class LootrunRenderer {
         pos4 = pos4.add(startVec).sub(camPos);
 
         vertexConsumer
-                .vertex(poseStack.last().pose(), pos1.x, pos1.y, pos1.z)
-                .color(color)
-                .uv(0, 1)
-                .endVertex();
+                .addVertex(poseStack.last().pose(), pos1.x, pos1.y, pos1.z)
+                .setColor(color)
+                .setUv(0, 1);
         vertexConsumer
-                .vertex(poseStack.last().pose(), pos2.x, pos2.y, pos2.z)
-                .color(color)
-                .uv(0, 0)
-                .endVertex();
+                .addVertex(poseStack.last().pose(), pos2.x, pos2.y, pos2.z)
+                .setColor(color)
+                .setUv(0, 0);
         vertexConsumer
-                .vertex(poseStack.last().pose(), pos3.x, pos3.y, pos3.z)
-                .color(color)
-                .uv(1, 0)
-                .endVertex();
+                .addVertex(poseStack.last().pose(), pos3.x, pos3.y, pos3.z)
+                .setColor(color)
+                .setUv(1, 0);
         vertexConsumer
-                .vertex(poseStack.last().pose(), pos4.x, pos4.y, pos4.z)
-                .color(color)
-                .uv(1, 1)
-                .endVertex();
+                .addVertex(poseStack.last().pose(), pos4.x, pos4.y, pos4.z)
+                .setColor(color)
+                .setUv(1, 1);
     }
 }
