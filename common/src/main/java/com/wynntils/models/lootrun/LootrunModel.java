@@ -54,6 +54,8 @@ import com.wynntils.utils.mc.PosUtils;
 import com.wynntils.utils.mc.type.Location;
 import com.wynntils.utils.type.CappedValue;
 import com.wynntils.utils.type.Pair;
+
+import java.awt.TextComponent;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
@@ -69,10 +71,17 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Chicken;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Vector2d;
 
@@ -184,6 +193,8 @@ public class LootrunModel extends Model {
         Models.Marker.registerMarkerProvider(LOOTRUN_BEACON_COMPASS_PROVIDER);
         reloadData();
         generateMissionPatterns();
+
+        WynntilsMod.registerEventListener(new SacrificeHologramHandler());
     }
 
     @Override
@@ -330,7 +341,9 @@ public class LootrunModel extends Model {
 
     @SubscribeEvent
     public void onEntitySpawn(SetEntityDataEvent event) {
-        Entity entity = McUtils.mc().level.getEntity(event.getId());
+        ClientLevel level = McUtils.mc().level;
+        Entity entity = level.getEntity(event.getId());
+
         if (!(entity instanceof ItemEntity itemEntity)) return;
 
         // We only care about items that are close to the lootrun master
