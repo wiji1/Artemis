@@ -1,28 +1,37 @@
+/*
+ * Copyright © Wynntils 2024.
+ * This file is released under LGPLv3. See LICENSE for full license details.
+ */
 package com.wynntils.models.lootrun;
 
 import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.persisted.storage.Storage;
 import com.wynntils.core.text.StyledText;
-import com.wynntils.mc.event.RemoveEntitiesEvent;
+import com.wynntils.mc.event.ContainerClickEvent;
 import com.wynntils.mc.event.SetEntityDataEvent;
+import com.wynntils.models.lootrun.event.LootrunFinishedEvent;
 import com.wynntils.models.lootrun.type.LootrunLocation;
 import com.wynntils.utils.mc.McUtils;
 import com.wynntils.utils.type.Pair;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class SacrificeHologramHandler {
-
     private static final Pattern REWARD_CHEST_PATTERN = Pattern.compile("§b§lReward Chest");
+    private static final Pattern SACRIFICE_BUTTON_PATTERN = Pattern.compile("§a§lConfirm Sacrifice");
+    private static final Pattern CLOSE_CHEST_PATTERN = Pattern.compile("§c§lClose Chest");
 
     private final Map<LootrunLocation, ArmorStand> currentHolograms = new EnumMap<>(LootrunLocation.class);
-    private final Storage<Map<LootrunLocation, Integer>> sacrificePulls = new Storage<>(new EnumMap<>(LootrunLocation.class));
+    private final Storage<Map<LootrunLocation, RewardChestInstance>> chestInstances =
+            new Storage<>(new EnumMap<>(LootrunLocation.class));
 
     @SubscribeEvent
     public void onEntitySpawn(SetEntityDataEvent event) {
@@ -31,7 +40,8 @@ public class SacrificeHologramHandler {
 
         if (entity instanceof ArmorStand && entity.getCustomName() != null) {
             if (REWARD_CHEST_PATTERN.matcher(entity.getCustomName().getString()).matches()) {
-                LootrunLocation camp = getClosestCamp(McUtils.player().getX(), McUtils.player().getZ());
+                LootrunLocation camp =
+                        getClosestCamp(McUtils.player().getX(), McUtils.player().getZ());
 
                 if (currentHolograms.get(camp) != null) {
                     ArmorStand oldStand = currentHolograms.get(camp);
@@ -40,7 +50,8 @@ public class SacrificeHologramHandler {
 
                 ArmorStand stand = new ArmorStand(level, entity.getX(), entity.getY() - 1.2, entity.getZ());
                 level.addEntity(stand);
-                stand.setCustomName(StyledText.fromString("§4§lSacrifice Pulls").getComponent());
+                stand.setCustomName(StyledText.fromString("§4§lSacrifice Pulls: §c " + getSacrificePulls(camp))
+                        .getComponent());
                 stand.setInvisible(true);
                 stand.setCustomNameVisible(true);
 
@@ -49,27 +60,91 @@ public class SacrificeHologramHandler {
         }
     }
 
+    @SubscribeEvent
+    public void onLootrunComplete(LootrunFinishedEvent.Completed event) {
+        LootrunLocation camp =
+                getClosestCamp(McUtils.player().getX(), McUtils.player().getZ());
+
+        chestInstances
+                .get()
+                .put(
+                        camp,
+                        new RewardChestInstance(
+                                event.getRewardPulls(),
+                                getSacrificePulls(camp),
+                                event.getRewardSacrifices(),
+                                event.getRewardRerolls()));
+
+        chestInstances.touched();
+    }
+
+    @SubscribeEvent
+    public void onItemClick(ContainerClickEvent event) {
+        ItemStack itemStack = event.getItemStack();
+        Component name = itemStack.getDisplayName();
+
+        Matcher matcher = SACRIFICE_BUTTON_PATTERN.matcher(name.getString());
+
+        if (matcher.matches()) {
+            LootrunLocation camp =
+                    getClosestCamp(McUtils.player().getX(), McUtils.player().getZ());
+
+            RewardChestInstance instance = chestInstances.get().get(camp);
+            instance.sacrificePulls *= (1.25 + (0.25 * instance.sacrifices));
+            chestInstances.touched();
+            return;
+        }
+
+        matcher = CLOSE_CHEST_PATTERN.matcher(name.getString());
+
+        if (matcher.matches()) {
+            WynntilsMod.info(event.getContainerMenu()
+                    .getSlot(4)
+                    .getItem()
+                    .getDisplayName()
+                    .getString());
+
+            LootrunLocation camp =
+                    getClosestCamp(McUtils.player().getX(), McUtils.player().getZ());
+
+            RewardChestInstance instance = chestInstances.get().get(camp);
+            instance.sacrificePulls = 0;
+            chestInstances.touched();
+            return;
+        }
+    }
+
     private LootrunLocation getClosestCamp(double x, double z) {
-
         for (LootrunLocation value : LootrunLocation.values()) {
-
             Pair<Integer, Integer> northEast = value.getNorthEastCorner();
             Pair<Integer, Integer> southWest = value.getSouthWestCorner();
 
             if (northEast == null || southWest == null) continue;
 
-            if(x > southWest.a() && x < northEast.a()
-                    && z > southWest.a() && z < southWest.b()) return value;
+            if (x > southWest.a() && x < northEast.a() && z > southWest.a() && z < southWest.b()) return value;
         }
 
         return LootrunLocation.UNKNOWN;
     }
 
-    public void setSacrificePulls(LootrunLocation camp, int pulls) {
-        sacrificePulls.get().put(camp, pulls);
+    private int getSacrificePulls(LootrunLocation camp) {
+        RewardChestInstance instance = chestInstances.get().get(camp);
+        return instance == null ? 0 : instance.sacrificePulls;
     }
 
-    public int getSacrificePulls(LootrunLocation camp) {
-        return sacrificePulls.get().get(camp);
+    public static class RewardChestInstance {
+        public int pulls;
+        public int sacrificePulls;
+
+        public int sacrifices;
+        public int rerolls;
+
+        public RewardChestInstance(int pulls, int sacrificePulls, int sacrifices, int rerolls) {
+            this.pulls = pulls;
+            this.sacrificePulls = sacrificePulls;
+
+            this.sacrifices = sacrifices;
+            this.rerolls = rerolls;
+        }
     }
 }
