@@ -161,6 +161,7 @@ import com.wynntils.features.wynntils.UpdatesFeature;
 import com.wynntils.features.wynntils.WeeklyConfigBackupFeature;
 import com.wynntils.mc.event.ClientsideMessageEvent;
 import com.wynntils.mc.event.CommandsAddedEvent;
+import com.wynntils.models.lootrun.SacrificeHologram;
 import com.wynntils.utils.mc.McUtils;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -386,6 +387,7 @@ public final class FeatureManager extends Manager {
         registerFeature(new ExtendedSeasonLeaderboardFeature());
         registerFeature(new MythicFoundFeature());
         registerFeature(new TerritoryDefenseMessageFeature());
+        registerFeature(new SacrificeHologram());
         // endregion
 
         // Reload Minecraft's config files so our own keybinds get loaded

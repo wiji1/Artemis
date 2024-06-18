@@ -10,7 +10,7 @@ public enum LootrunLocation {
     SILENT_EXPANSE(new Pair<>(1500, -1000), new Pair<>(400, -300)),
     CORKUS(new Pair<>(-1200, -3400), new Pair<>(-1800, -2100)),
     MOLTEN_HEIGHTS_HIKE(new Pair<>(1500, -5600), new Pair<>(1000, -5000)),
-    SKY_ISLANDS_EXPLORATION(new Pair<>(1500, -4900), new Pair<>(800, -4400)),
+    SKY_ISLANDS_EXPLORATION(new Pair<>(1500, -4900), new Pair<>(800, -4200)),
     UNKNOWN(null, null),
     ;
 

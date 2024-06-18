@@ -93,8 +93,8 @@ public class LootrunModel extends Model {
 
     // Rewards
     private static final Pattern REWARD_PULLS_PATTERN = Pattern.compile("[À\\s]*§.(\\d+)§7 Reward Pulls§r");
-    private static final Pattern REWARD_REROLLS_PATTERN = Pattern.compile("[À\\s]*§.(\\d+)§7 Reward Rerolls§r");
-    private static final Pattern REWARD_SACRIFICES_PATTERN = Pattern.compile("[À\\s]*§.(\\d+)§7 Reward Sacrifices§r");
+    private static final Pattern REWARD_REROLLS_PATTERN = Pattern.compile("[À\\s]*§.(\\d+)§7 Reward Reroll[s]§r");
+    private static final Pattern REWARD_SACRIFICES_PATTERN = Pattern.compile("[À\\s]*§.(\\d+)§7 Reward Sacrifice[s]§r");
     private static final Pattern LOOTRUN_EXPERIENCE_PATTERN = Pattern.compile("[À\\s]*§.(\\d+)§7 Lootrun Experience§r");
 
     // Statistics
@@ -188,8 +188,6 @@ public class LootrunModel extends Model {
         Models.Marker.registerMarkerProvider(LOOTRUN_BEACON_COMPASS_PROVIDER);
 
         reloadData();
-
-        WynntilsMod.registerEventListener(new SacrificeHologramHandler());
     }
 
     @Override
